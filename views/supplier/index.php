@@ -88,7 +88,6 @@ $this->registerJs(
             $('input[name="selection[]"]:checkbox:checked').each(function() { 
                 ids.push($(this).val());
             });
-            // $('.export-submit').submit(['data', "id"], function () {});
 
             $('.export-submit').click(function() {
                 $.fileDownload("$url", {
@@ -103,7 +102,7 @@ $this->registerJs(
                     }
                 });
             });
-            // $('.close').click();
+            $('.close').click();
         });
     JS
 );
@@ -113,7 +112,7 @@ Modal::end();
 
 <?php
 
-$this->registerJsFile('/js/jquery.fileDownload.min.js', ['depends' => [\yii\web\JqueryAsset::classname()]]);
+$this->registerJsFile('/js/jquery.fileDownload.min.js', ['depends' => [\yii\web\JqueryAsset::class]]);
 
 $this->registerJs(
     <<<JS
@@ -133,6 +132,7 @@ $this->registerJs(
             $('input:checkbox').prop('checked', true);
             $('.select-tips-page').removeClass('d-block');
             $('.select-tips-all').addClass('d-block');
+            $('.').append('<input type="hidden" name="is-select-all" value=1>');
         });
         $('.select-clear').on('click', function () {
             localStorage.setItem('select-check-all', 'off');
