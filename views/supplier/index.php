@@ -52,7 +52,9 @@ $this->params['breadcrumbs'][] = $this->title;
             ['class' => 'yii\grid\ActionColumn'],
         ],
         'showFooter' => true,
-    ]); ?>
+    ]);
+    ?>
+    <?= Html::input('hidden', 'is_all', 0, ['name' => 'is-select-all']) ?>
 
 </div>
 
@@ -93,7 +95,8 @@ $this->registerJs(
                 $.fileDownload("$url", {
                     data: {
                         'id': ids,
-                        'columns': columns
+                        'columns': columns,
+                        'is_all': $('input[name="is-select-all"]').val()
                     },
                     dataType: 'json',
                     // httpMethod: 'post',

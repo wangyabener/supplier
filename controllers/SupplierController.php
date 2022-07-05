@@ -137,8 +137,12 @@ class SupplierController extends Controller
 
     public function actionExport($type = 'csv')
     {
-        $columns = $this->request->post('columns');
-        $id = $this->request->post();
+        $columns = $this->request->get('columns');
+        $id = $this->request->get('id');
+        $is_all = $this->request->get('is_all');
+
+        echo $is_all;
+        exit();
 
         $export = new ExportView([
             'dataProvider' => new ActiveDataProvider([
