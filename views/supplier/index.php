@@ -1,11 +1,9 @@
 <?php
 
-use PHPUnit\Util\Log\JSON;
 use yii\bootstrap4\Modal;
 use yii\helpers\Html;
 use yii\helpers\Url;
 use yii\grid\GridView;
-use yii\widgets\Pjax;
 
 /* @var $this yii\web\View */
 /* @var $searchModel app\models\Search\SupplierSearch */
@@ -34,14 +32,11 @@ $this->params['breadcrumbs'][] = $this->title;
     <p class="d-none select-tips-page">All 20 conversations on this page have been selected. <a class="select-all">Select all conversations that match this search</a></p>
     <p class="d-none select-tips-all">All conversations in this search have been selected. <a class="select-clear">clear selection</a></p>
 
-    <?php
-    echo GridView::widget([
+    <?= GridView::widget([
         'dataProvider' => $dataProvider,
         'columns' => [
             [
                 'class' => 'yii\grid\CheckboxColumn',
-                'footerOptions' => ['colspan' => 1],
-                'footer' => '<a class="btn btn-danger">Delete</a>'
             ],
             'id',
             'name',
@@ -51,10 +46,10 @@ $this->params['breadcrumbs'][] = $this->title;
             'created_at',
             ['class' => 'yii\grid\ActionColumn'],
         ],
-        'showFooter' => true,
+        'showFooter' => false,
     ]);
     ?>
-    <?= Html::input('hidden', 'is_all', 0, ['name' => 'is-select-all']) ?>
+    <?= Html::input('hidden', 'is-select-all', 0) ?>
 
 </div>
 
@@ -81,12 +76,11 @@ $url = Url::toRoute('export');
 $this->registerJs(
     <<<JS
         $('.export-submit').on('click', function () {
-            var select = localStorage.getItem('select-check-all');
             var columns = [];
-            var ids = [];
             $('input[name="select-columns[]"]:checkbox:checked').each(function () {
                 columns.push($(this).val());
             });
+            var ids = [];
             $('input[name="selection[]"]:checkbox:checked').each(function() { 
                 ids.push($(this).val());
             });
@@ -99,7 +93,6 @@ $this->registerJs(
                         'is_all': $('input[name="is-select-all"]').val()
                     },
                     dataType: 'json',
-                    // httpMethod: 'post',
                     success: function (result) {
                         console.log(result);
                     }
@@ -119,36 +112,97 @@ $this->registerJsFile('/js/jquery.fileDownload.min.js', ['depends' => [\yii\web\
 
 $this->registerJs(
     <<<JS
-        var page = $('.pagination').find('li.active > a').text();
-        $('.select-on-check-all').on('click', function () {
+
+        var cur_page = $('.pagination').find('li.active > a').text();
+
+        var json = sessionStorage.getItem('select-page');
+        if (json) {
+            pages = JSON.parse(json);
+            for (var j = 0; j < pages.length; j++) {
+                if (pages[j] == cur_page) {
+                    $('input[name="selection_all"]').prop('checked', true);
+                    $('.select-tips-page').addClass('d-block');
+                }
+            }
+        }
+
+        $('input[name="selection_all"]').on('click', function () {
             if ($(this).prop('checked')) {
-                localStorage.setItem('select-check-page', page);
                 $('.select-tips-page').addClass('d-block');
+                checkPage(true, cur_page);
             } else {
-                localStorage.setItem('select-check-page', 0);
                 $('.select-tips-page').removeClass('d-block');
+                checkPage(false, cur_page);
             }
         });
-        $('.select-all').on('click', function () {
-            localStorage.setItem('select-check-all', 'on');
-            localStorage.setItem('select-check-page', 0);
+        var json = sessionStorage.getItem('select-checked');
+        if (json) {
+            items = JSON.parse(json);
+            for(var i = 0; i < items.length; i++) {
+                $('tr[data-key=' + items[i] + '] > td > input').prop('checked', true);
+            }
+            // $('.select-tips-page').addClass('d-block');
+        }
+
+        if (sessionStorage.getItem('select-all')) {
             $('input:checkbox').prop('checked', true);
             $('.select-tips-page').removeClass('d-block');
             $('.select-tips-all').addClass('d-block');
-            $('.').append('<input type="hidden" name="is-select-all" value=1>');
+        }
+
+        $('.select-all').on('click', function () {
+            checkAll(true);
         });
         $('.select-clear').on('click', function () {
-            localStorage.setItem('select-check-all', 'off');
-            $('input:checkbox').prop('checked', false);
-            $('.select-tips-all').removeClass('d-block');
+            checkAll(false);
         });
-        if (localStorage.getItem('select-check-all') == 'on') {
-            $('input:checkbox').prop('checked', true);
-            $('.select-tips-all').addClass('d-block');
+
+        function checkAll(type = true)
+        {
+            sessionStorage.setItem('select-all', type);
+            $('input:checkbox').prop('checked', type);
+            if (type) {
+                $('.select-tips-page').removeClass('d-block');
+                $('.select-tips-all').addClass('d-block');
+
+                $('input[name="is-select-all"]').val(1);
+            } else {
+                $('.select-tips-page').removeClass('d-block');
+                $('.select-tips-all').removeClass('d-block');
+                sessionStorage.clear();
+            }
         }
-        if (localStorage.getItem('select-check-page') == page) {
-            $('input:checkbox').prop('checked', true);
-            $('.select-tips-page').addClass('d-block');
+
+        function checkPage(type = true, page)
+        {
+            var ids = JSON.parse(sessionStorage.getItem('select-checked'));
+            if (!ids) ids = [];
+            $('input[name="selection[]"]').each(function(i) { 
+                console.log($(this).val());
+                if (type) {
+                    ids.push($(this).val());
+                } else {
+                    var index = $.inArray($(this).val(), ids);
+                    ids.splice(index, 1);
+                }
+            });
+            console.log(ids);
+
+            sessionStorage.setItem(
+                'select-checked', JSON.stringify(ids)
+            );
+
+            var select = JSON.parse(sessionStorage.getItem('select-page'));
+            if (!select) select = [];
+            if (type) {
+                select.push(page);
+            } else {
+                var index = $.inArray(page, select);
+                select.splice(index, 1);
+            }
+            sessionStorage.setItem(
+                'select-page', JSON.stringify(select)
+            );
         }
 JS
 );

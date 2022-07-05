@@ -38,7 +38,7 @@ class SupplierController extends Controller
         $model  = new SupplierSearch();
         $provider = $model->search($this->request->queryParams);
 
-        return $this->renderPartial('excel', ['searchModel' => $model,'dataProvider' => $provider]);
+        return $this->renderPartial('excel', ['searchModel' => $model, 'dataProvider' => $provider]);
     }
 
     /**
@@ -139,17 +139,20 @@ class SupplierController extends Controller
     {
         $columns = $this->request->get('columns');
         $id = $this->request->get('id');
-        $is_all = $this->request->get('is_all');
+        $is_all = $this->request->get('is_all', 0);
 
-        echo $is_all;
-        exit();
+        $query = Supplier::find();
+        if (!$is_all && $id) {
+            $query->where(['in', 'id', $id]);
+        }
 
         $export = new ExportView([
             'dataProvider' => new ActiveDataProvider([
-                'query' => Supplier::find()
+                'query' => $query
             ]),
         ]);
-        $export->setFilename('supplier')->setColumns($columns);
+        $export->setFilename('supplier')
+            ->setColumns($columns);
 
         return $export->export();
     }
