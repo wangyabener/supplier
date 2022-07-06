@@ -7,6 +7,9 @@ use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use yii\grid\GridView;
 use yii\helpers\ArrayHelper;
 
+/**
+ * Export
+ */
 class ExportView extends GridView
 {
     protected $filename = 'export';
@@ -77,6 +80,9 @@ class ExportView extends GridView
         // );
     }
 
+    /**
+     * Generate English letters from numbers
+     */
     protected static function columnTitle($index)
     {
         $i = $index - 1;

@@ -151,16 +151,17 @@ $this->registerJs(
             $('.select-tips-all').addClass('d-block');
         }
 
-        $('.select-all').on('click', function () {
-            checkAll(true);
-        });
         $('.select-clear').on('click', function () {
             checkAll(false);
+        });
+        $('.select-all').on('click', function () {
+            checkAll(true);
         });
 
         function checkAll(type = true)
         {
             sessionStorage.setItem('select-all', type);
+
             $('input:checkbox').prop('checked', type);
             if (type) {
                 $('.select-tips-page').removeClass('d-block');

@@ -70,7 +70,9 @@ class SupplierSearch extends Supplier
             ->andFilterWhere(['like', 't_status', $this->t_status]);
 
         $operator = isset($params['search-operator']) ? $params['search-operator'] : '=';
-        $query->andFilterWhere([$operator, 'id', $this->id]);
+        if (in_array($operator, ['>', '<', '>=', '<=', '='])) {
+            $query->andFilterWhere([$operator, 'id', $this->id]);
+        }
 
         return $dataProvider;
     }
