@@ -33,18 +33,25 @@ class m220629_030024_create_suppliers_table extends Migration
         // table comment
         $this->addCommentOnTable($this->table, 'Supplier master table');
 
+        // Randomly generated username
+        $firstname = ['Smith', 'Jones', 'Taylor', 'LiWilson', 'Roberts', 'Evans', 'Brown', 'Jackson', 'Thompson', 'Lewis'];
+        $lastname = [
+            'James', 'John', 'Robert', 'Michael', 'William', 'David', 'Richard', 'Thomas',
+            'Mary', 'Linda', 'Maria', 'Nancy', 'Lisa', 'Betty', 'Barbara', 'Helen', 'Jennifer'
+        ];
+        $usernames = [];
+        for ($i = 0; $i < 25; $i++) {
+            $usernames[] = $firstname[array_rand($firstname)] . ' ' 
+                . $lastname[array_rand($lastname)];
+        }
+        $mobiles = ['131', '188', '176', '159', '186', '155'];
+
+        // Generate code
         $hashids = new Hashids('Supplier', 3);
 
-        // init data
+        // Init data
         $suppliers = [];
-        $candidates = [
-            'Lin chong', 'Song jiang', 'Lu zhishen', 'Wu yong', 'Chao gai',
-            'Wu song', 'Gong songsheng', 'Lu junyi', 'Hua rong', 'Li kui',
-            'Zhang fei', 'Liu bei', 'Guan yu', 'Zhao yun', 'Zhu geliang',
-            'Cao cao', 'Xun yu', 'Guo jia', 'Zhang liao', 'Xia houdun'
-        ];
-        $mobiles = ['131', '188', '176', '159', '186', '155'];
-        foreach ($candidates as $key => $item) {
+        foreach ($usernames as $key => $item) {
             $suppliers[] = [
                 $key + 1,
                 $item,
@@ -57,7 +64,7 @@ class m220629_030024_create_suppliers_table extends Migration
             ];
         }
 
-        // insert
+        // Insert
         $columns = ['id', 'name', 'code', 'mobile', 't_status', 'description', 'created_at', 'updated_at'];
         $this->batchInsert($this->table, $columns, $suppliers);
     }
