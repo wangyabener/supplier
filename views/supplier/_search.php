@@ -24,16 +24,18 @@ use yii\widgets\Pjax;
                 'template' => '
                 <label class="control-label">ID</label>
                 <div class="input-group">
-                <button class="btn dropdown-toggle btn-outline-secondary" type="button" data-toggle="dropdown" aria-expanded="false">Select</button>
-                <ul class="dropdown-menu">
-                    <li><a class="dropdown-item" href="#"> > </a></li>
-                    <li><a class="dropdown-item" href="#"> < </a></li>
-                    <li><a class="dropdown-item" href="#"> >= </a></li>
-                    <li><a class="dropdown-item" href="#"> <= </a></li>
-                </ul>
-                {input}
-                </div>'
-            ])->label('ID') ?>
+                    <select class="form-control col-4 search-operator" name="search-operator">
+                        <option value="="> = </option>   
+                        <option value=">"> > </option>
+                        <option value="<"> < </option>
+                        <option value=">="> >= </option>
+                        <option value="<="> <= </option>
+                    </select>
+                    {input}
+                </div>
+                '
+            ])->label('')
+            ?>
         </div>
         <div class="col">
             <?= $form->field($model, 'name') ?>
@@ -60,6 +62,16 @@ use yii\widgets\Pjax;
 
     <?php
     ActiveForm::end();
+    ?>
+
+    <?php
+
+    $operator = Yii::$app->request->getQueryParam('search-operator', '=');
+    $this->registerJs(
+        <<<JS
+            $(".search-operator").val("$operator");
+        JS
+    );
     ?>
 
 </div>

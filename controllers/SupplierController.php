@@ -55,8 +55,10 @@ class SupplierController extends Controller
         $models = $provider->getModels();
         $columns = [];
 
-        foreach (reset($models) as $name => $value) {
-            $columns[(string) $name] = (string) $name;
+        if ($models) {
+            foreach (reset($models) as $name => $value) {
+                $columns[(string) $name] = (string) $name;
+            }
         }
 
         return $this->render('index', [
@@ -139,7 +141,7 @@ class SupplierController extends Controller
     {
         $columns = $this->request->get('columns');
         $id = $this->request->get('id');
-        $is_all = $this->request->get('is_all', 0);
+        $is_all = $this->request->get('is_all', false);
 
         $query = Supplier::find();
         if (!$is_all && $id) {

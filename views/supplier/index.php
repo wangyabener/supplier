@@ -4,6 +4,7 @@ use yii\bootstrap4\Modal;
 use yii\helpers\Html;
 use yii\helpers\Url;
 use yii\grid\GridView;
+use yii\widgets\Pjax;
 
 /* @var $this yii\web\View */
 /* @var $searchModel app\models\Search\SupplierSearch */
@@ -50,7 +51,6 @@ $this->params['breadcrumbs'][] = $this->title;
     ]);
     ?>
     <?= Html::input('hidden', 'is-select-all', 0) ?>
-
 </div>
 
 <?= Html::beginForm(Url::toRoute('export'), 'post', ['class' => ['export-form']]) ?>
@@ -88,8 +88,8 @@ $this->registerJs(
             $.fileDownload("$url", {
                 data: {
                     'id': ids,
+                    'is_all': sessionStorage.getItem('select-all'),
                     'columns': columns,
-                    'is_all': $('input[name="is-select-all"]').val()
                 },
                 dataType: 'json',
                 success: function (result) {
@@ -165,8 +165,6 @@ $this->registerJs(
             if (type) {
                 $('.select-tips-page').removeClass('d-block');
                 $('.select-tips-all').addClass('d-block');
-
-                $('input[name="is-select-all"]').val(1);
             } else {
                 $('.select-tips-page').removeClass('d-block');
                 $('.select-tips-all').removeClass('d-block');
