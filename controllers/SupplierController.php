@@ -137,6 +137,12 @@ class SupplierController extends Controller
         return $this->redirect(['index']);
     }
 
+    /**
+     * Export data
+     * 
+     * @param string $type
+     * @return void
+     */
     public function actionExport($type = 'csv')
     {
         $columns = $this->request->get('columns');
